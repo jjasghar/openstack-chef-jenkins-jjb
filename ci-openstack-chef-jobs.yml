@@ -1,0 +1,61 @@
+- job-template:
+    name: '{name}-provision'
+    project-type: freestyle
+    scm:
+      - git:
+          url: '{git_repo_url}'
+          branches:
+            - '{branch_to_monitor}'
+    publishers:
+      - trigger:
+          project: '{name}-install-chef-dk'
+          threshold: SUCCESS
+
+- job-template:
+    name: '{name}-install-chef-dk'
+    builders:
+      - shell: |
+          #!/bin/bash -x
+
+          sudo apt-get -y install build-essential liblzma-dev zlib1g-dev wget
+
+          chefdk=chefdk_0.4.0-1_amd64.deb
+          wget -nv -t 3 https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/$chefdk
+          sudo dpkg -i $chefdk
+          rm $chefdk
+    publishers:
+      - trigger:
+          project: '{name}-chef-bundle-install'
+          threshold: SUCCESS
+
+- job-template:
+    name: '{name}-chef-bundle-install'
+    project-type: freestyle
+    scm:
+      - git:
+          url: '{git_repo_url}'
+          branches:
+            - '{branch_to_monitor}'
+    builders:
+        - shell: |
+            #!/bin/bash -x
+
+            chef exec bundle install
+    publishers:
+      - trigger:
+          project: '{name}-chef-rake'
+          threshold: SUCCESS
+
+- job-template:
+    name: '{name}-chef-rake'
+    project-type: freestyle
+    scm:
+      - git:
+          url: '{git_repo_url}'
+          branches:
+            - '{branch_to_monitor}'
+    builders:
+        - shell: |
+            #!/bin/bash -x
+
+            chef exec rake

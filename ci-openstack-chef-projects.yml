@@ -1,0 +1,23 @@
+- project:
+    name: openstack-chef-repo
+    git_repo_url: 'https://github.com/openstack/openstack-chef-repo'
+    branch_to_monitor: master
+    project:
+      - openstack-chef-repo
+    jobs:
+      - '{name}-provision'
+      - '{name}-install-chef-dk'
+      - '{name}-chef-bundle-install'
+      - '{name}-chef-rake'
+
+- project:
+    name: knife-openstack
+    git_repo_url: 'https://github.com/chef/knife-openstack'
+    branch_to_monitor: master
+    project:
+      - knife-openstack
+    jobs:
+      - '{name}-provision'
+      - '{name}-install-chef-dk'
+      - '{name}-chef-bundle-install'
+      - '{name}-chef-rake'
